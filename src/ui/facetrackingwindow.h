@@ -64,6 +64,7 @@ public slots:
 
 private slots:
     void timer_tick();
+    void toggle_recording();
 
 signals:
     void faceDetected(DetectionInformation detectedFace);
@@ -86,6 +87,8 @@ private:
 
     QLabel* total_detection_label;
 
+    QPushButton* recordButton;
+
     int teenMales;
     int teenFemales;
     int adultMales;
@@ -93,6 +96,9 @@ private:
     int seniorMales;
     int seniorFemales;
     int detections;
+
+    bool recording;
+    VideoWriter* videoOutput;
 
 
 };

@@ -3,7 +3,7 @@
 FaceTrackingWindow::FaceTrackingWindow(QWidget *parent, DemoManagerWindow *windowManager) :
     QWidget(parent)
 {
-
+   recording = false;
    stop = false;
 
    teenMales = 0;
@@ -68,6 +68,9 @@ FaceTrackingWindow::FaceTrackingWindow(QWidget *parent, DemoManagerWindow *windo
   total_detection_label = new QLabel("Detections : 0");
 
 
+  recordButton = new QPushButton("Start recording");
+
+
   teen_male_label->setFont(QFont( "Arial", 18));
   teen_female_label->setFont(QFont( "Arial", 18));
   adult_male_label->setFont(QFont( "Arial", 18));
@@ -81,7 +84,10 @@ FaceTrackingWindow::FaceTrackingWindow(QWidget *parent, DemoManagerWindow *windo
   adult_stats_layout = new QVBoxLayout();
   senior_stats_layout = new QVBoxLayout();
 
+  stats_layout->addWidget(recordButton);
   stats_layout->addWidget(total_detection_label);
+
+
 
 
   stats_layout->addLayout(teen_stats_layout);
@@ -104,11 +110,39 @@ FaceTrackingWindow::FaceTrackingWindow(QWidget *parent, DemoManagerWindow *windo
   timer->start(40);
 
   connect(this, SIGNAL(faceDetected(DetectionInformation)), windowManager, SLOT(face_detected(DetectionInformation)));
+  connect(recordButton, SIGNAL(clicked()), this, SLOT(toggle_recording()));
 
-
+  videoOutput = NULL;
 
 }
 
+void FaceTrackingWindow::toggle_recording()
+{
+    if (recording)
+    {
+        recordButton->setText("Start recording");
+        recording = false;
+        delete videoOutput;
+    }
+    else
+    {
+
+        recordButton->setText("Stop recording");
+        videoOutput = new VideoWriter();
+        videoOutput->open("Recording.avi",
+                         CV_FOURCC('M', 'J', 'P', 'G'),
+                         15,
+                         Size(640, 480)
+                         );
+
+        if (!videoOutput->isOpened())
+            {
+                throw "Could not open the output video for write";
+            }
+
+        recording = true;
+    }
+}
 
 FaceTrackingWindow::~FaceTrackingWindow()
 {
@@ -196,9 +230,18 @@ void FaceTrackingWindow::timer_tick()
     }
 
 
+    if (recording)
+    {
+        std::cout << "Adding to video" << std::endl;
+        (*videoOutput).write(result);
+
+    }
+
     stats_widget->setFixedHeight(this->height()*0.15);
 
     cv::cvtColor(result, convertFrame,cv::COLOR_BGR2RGB);
+
+
 
     delete frameToShow;
     frameToShow = NULL;
