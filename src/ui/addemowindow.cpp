@@ -6,11 +6,11 @@ AdDemoWindow::AdDemoWindow(QWidget *parent) :
 
     layout = new QHBoxLayout(this);
 
-    image = QPixmap("ads/adult_male.jpg");
-    imageLabel = new QLabel();
+    image = new QPixmap("ads//adult_male.jpg");
+    imageLabel = new QLabel(this);
     imageLabel->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding );
     imageLabel->setScaledContents(true);
-    imageLabel->setPixmap(image.scaled(imageLabel->width(), imageLabel->height(), Qt::KeepAspectRatio));
+    imageLabel->setGeometry(100,100,image->width(),image->height());
 
     layout->addWidget(imageLabel);
 

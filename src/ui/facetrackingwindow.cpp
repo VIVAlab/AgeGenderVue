@@ -1,118 +1,116 @@
 #include "facetrackingwindow.h"
 
 FaceTrackingWindow::FaceTrackingWindow(QWidget *parent, DemoManagerWindow *windowManager) :
-    QWidget(parent)
+        QWidget(parent)
 {
-   recording = false;
-   stop = false;
+    recording = false;
+    stop = false;
+    lock_writter=false;
 
-   teenMales = 0;
-   teenFemales = 0;
-   adultMales = 0;
-   adultFemales = 0;
-   seniorMales = 0;
-   seniorFemales = 0;
+    teenMales = 0;
+    teenFemales = 0;
+    adultMales = 0;
+    adultFemales = 0;
+    seniorMales = 0;
+    seniorFemales = 0;
 
-   detections = 0;
+    detections = 0;
 
-
-   //Open the webcam. The number represents the webcam ID, 0 is the default.
-   capture.open(1);
-
-
-   //cv::namedWindow("Output", cv::WINDOW_NORMAL);
-   //cv::setWindowProperty("Output", cv::WND_PROP_FULLSCREEN, cv::WINDOW_AUTOSIZE);
-
-   //cv::resizeWindow("Output", 1920, 1080);
-
-
-   if(! capture.isOpened())
-   {
-       throw "No capture";
-   }
-
-
-  frameToShow = NULL;
+    //Open the webcam. The number represents the webcam ID, 0 is the default.
+    capture.open(0);
 
 
 
-
-  imageLabel = new QLabel();
-  imageLabel->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding );
-  imageLabel->setScaledContents(true);
-
-
-  layout = new QVBoxLayout(this);
-  layout->addWidget(imageLabel);
+    if(! capture.isOpened())
+    {
+        throw "No capture";
+    }
 
 
-  stats_widget = new QWidget();
-  stats_layout = new QHBoxLayout(stats_widget);
-  stats_widget->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding );
-  layout->addWidget(stats_widget);
+    frameToShow = NULL;
+
+    number=0;
+
+
+    imageLabel = new QLabel();
+    imageLabel->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding );
+    imageLabel->setScaledContents(true);
+
+
+    layout = new QVBoxLayout(this);
+    layout->addWidget(imageLabel);
+
+
+    stats_widget = new QWidget();
+    stats_layout = new QHBoxLayout(stats_widget);
+    stats_widget->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding );
+    layout->addWidget(stats_widget);
 
 
 
 
 
 
-  this->setLayout(layout);
+    this->setLayout(layout);
 
 
-  teen_male_label = new QLabel("Teen males : 0");
-  teen_female_label = new QLabel("Teen females : 0");
-  adult_male_label = new QLabel("Adult males : 0");
-  adult_female_label = new QLabel("Adult females : 0");
-  senior_male_label = new QLabel("Senior males : 0");
-  senior_female_label = new QLabel("Senior females : 0");
-  total_detection_label = new QLabel("Detections : 0");
+    teen_male_label = new QLabel("Teen males : 0");
+    teen_female_label = new QLabel("Teen females : 0");
+    adult_male_label = new QLabel("Adult males : 0");
+    adult_female_label = new QLabel("Adult females : 0");
+    senior_male_label = new QLabel("Senior males : 0");
+    senior_female_label = new QLabel("Senior females : 0");
+    total_detection_label = new QLabel("Detections : 0");
 
 
-  recordButton = new QPushButton("Start recording");
+    recordButton = new QPushButton("Start recording");
 
 
-  teen_male_label->setFont(QFont( "Arial", 18));
-  teen_female_label->setFont(QFont( "Arial", 18));
-  adult_male_label->setFont(QFont( "Arial", 18));
-  adult_female_label->setFont(QFont( "Arial", 18));
-  senior_male_label->setFont(QFont( "Arial", 18));
-  senior_female_label->setFont(QFont( "Arial", 18));
-  total_detection_label->setFont(QFont( "Arial", 24, QFont::Bold));
+    teen_male_label->setFont(QFont( "Arial", 18));
+    teen_female_label->setFont(QFont( "Arial", 18));
+    adult_male_label->setFont(QFont( "Arial", 18));
+    adult_female_label->setFont(QFont( "Arial", 18));
+    senior_male_label->setFont(QFont( "Arial", 18));
+    senior_female_label->setFont(QFont( "Arial", 18));
+    total_detection_label->setFont(QFont( "Arial", 24, QFont::Bold));
 
 
-  teen_stats_layout = new QVBoxLayout();
-  adult_stats_layout = new QVBoxLayout();
-  senior_stats_layout = new QVBoxLayout();
+    teen_stats_layout = new QVBoxLayout();
+    adult_stats_layout = new QVBoxLayout();
+    senior_stats_layout = new QVBoxLayout();
 
-  stats_layout->addWidget(recordButton);
-  stats_layout->addWidget(total_detection_label);
-
-
+    stats_layout->addWidget(recordButton);
+    stats_layout->addWidget(total_detection_label);
 
 
-  stats_layout->addLayout(teen_stats_layout);
-  stats_layout->addLayout(adult_stats_layout);
-  stats_layout->addLayout(senior_stats_layout);
-
-  teen_stats_layout->addWidget(teen_male_label);
-  teen_stats_layout->addWidget(teen_female_label);
-  adult_stats_layout->addWidget(adult_male_label);
-  adult_stats_layout->addWidget(adult_female_label);
-  senior_stats_layout->addWidget(senior_male_label);
-  senior_stats_layout->addWidget(senior_female_label);
 
 
-  faceTracker.init(true, true);
+    stats_layout->addLayout(teen_stats_layout);
+    stats_layout->addLayout(adult_stats_layout);
+    stats_layout->addLayout(senior_stats_layout);
 
-  QTimer *timer = new QTimer(this);
-  connect(timer, SIGNAL(timeout()), this, SLOT(timer_tick()));
+    teen_stats_layout->addWidget(teen_male_label);
+    teen_stats_layout->addWidget(teen_female_label);
+    adult_stats_layout->addWidget(adult_male_label);
+    adult_stats_layout->addWidget(adult_female_label);
+    senior_stats_layout->addWidget(senior_male_label);
+    senior_stats_layout->addWidget(senior_female_label);
 
-  timer->start(40);
 
-  connect(this, SIGNAL(faceDetected(DetectionInformation)), windowManager, SLOT(face_detected(DetectionInformation)));
-  connect(recordButton, SIGNAL(clicked()), this, SLOT(toggle_recording()));
+    faceTracker.init(true, true);
 
-  videoOutput = NULL;
+    QTimer *timer = new QTimer(this);
+    QTimer *timer_write = new QTimer(this);
+
+    connect(timer, SIGNAL(timeout()), this, SLOT(timer_tick_m()));
+    connect(timer_write, SIGNAL(timeout()), this, SLOT(timer_tick_w()));
+    timer->start(20);
+    timer_write->start(5000);
+
+    connect(this, SIGNAL(faceDetected(DetectionInformation)), windowManager, SLOT(face_detected(DetectionInformation)));
+    connect(recordButton, SIGNAL(clicked()), this, SLOT(toggle_recording()));
+
+    videoOutput = NULL;
 
 }
 
@@ -130,15 +128,15 @@ void FaceTrackingWindow::toggle_recording()
         recordButton->setText("Stop recording");
         videoOutput = new VideoWriter();
         videoOutput->open("Recording.avi",
-                         CV_FOURCC('M', 'J', 'P', 'G'),
-                         15,
-                         Size(640, 480)
-                         );
+                          CV_FOURCC('M', 'J', 'P', 'G'),
+                          15,
+                          Size(640, 480)
+                          );
 
         if (!videoOutput->isOpened())
-            {
-                throw "Could not open the output video for write";
-            }
+        {
+            throw "Could not open the output video for write";
+        }
 
         recording = true;
     }
@@ -146,14 +144,14 @@ void FaceTrackingWindow::toggle_recording()
 
 FaceTrackingWindow::~FaceTrackingWindow()
 {
-   //CLOSE the video file.  called by destructor:
+    //CLOSE the video file.  called by destructor:
 
     delete objectTracker;
     delete frameToShow;
     capture.release();
 }
 
-void FaceTrackingWindow::timer_tick()
+void FaceTrackingWindow::timer_tick_m()
 {
     //read next frame if any
     if(!capture.read(frame))
@@ -163,85 +161,92 @@ void FaceTrackingWindow::timer_tick()
     }
 
     cv::Mat result = faceTracker.track(frame);
+    vector<DetectionInformation> bestv = faceTracker.getBestDetection_m();
+    push_back_db();
+    for(int i=0;i<bestv.size();i++){
+            DetectionInformation best=bestv[i];
 
-    DetectionInformation best = faceTracker.getBestDetection();
-
-    //Good detection
-    if (best.getAge() != -1)
-    {
-        detections++;
-        if (best.getGender() && best.getAge() == 1)
+        //Good detection
+        if (best.getAge() != -1)
         {
-            teenMales++;
+            detections++;
+            if (best.getGender() && best.getAge() == 1)
+            {
+                teenMales++;
+            }
+            else if (best.getGender() && best.getAge() == 3)
+            {
+                seniorMales++;
+            }
+            else if (!best.getGender() && best.getAge() == 3)
+            {
+                seniorFemales++;
+            }
+            else if (!best.getGender() && best.getAge() == 1)
+            {
+                teenFemales++;
+            }
+            else if (best.getGender())
+            {
+                adultMales++;
+            }
+            else if (!best.getGender())
+            {
+                adultFemales++;
+            }
+
+            stringstream sstm;
+            sstm << "Teen males : " << teenMales;
+            teen_male_label->setText(sstm.str().c_str());
+
+
+            stringstream sstf;
+            sstf << "Teen females : " << teenFemales;
+            teen_female_label->setText(sstf.str().c_str());
+
+            stringstream ssam;
+            ssam << "Adult males : " << adultMales;
+            adult_male_label->setText(ssam.str().c_str());
+
+            stringstream ssaf;
+            ssaf << "Adult females : " << adultFemales;
+            adult_female_label->setText(ssaf.str().c_str());
+
+            stringstream sssm;
+            sssm << "Senior males : " << seniorMales;
+            senior_male_label->setText(sssm.str().c_str());
+
+            stringstream sssf;
+            sssf << "Senior females : " << seniorFemales;
+            senior_female_label->setText(sssf.str().c_str());
+
+
+            stringstream ds;
+            ds << "Detections : " << detections;
+            total_detection_label->setText(ds.str().c_str());
+
+
         }
-        else if (best.getGender() && best.getAge() == 3)
-        {
-            seniorMales++;
-        }
-        else if (!best.getGender() && best.getAge() == 3)
-        {
-            seniorFemales++;
-        }
-        else if (!best.getGender() && best.getAge() == 1)
-        {
-            teenFemales++;
-        }
-        else if (best.getGender())
-        {
-            adultMales++;
-        }
-        else if (!best.getGender())
-        {
-            adultFemales++;
-        }
-
-        stringstream sstm;
-        sstm << "Teen males : " << teenMales;
-        teen_male_label->setText(sstm.str().c_str());
-
-
-        stringstream sstf;
-        sstf << "Teen females : " << teenFemales;
-        teen_female_label->setText(sstf.str().c_str());
-
-        stringstream ssam;
-        ssam << "Adult males : " << adultMales;
-        adult_male_label->setText(ssam.str().c_str());
-
-        stringstream ssaf;
-        ssaf << "Adult females : " << adultFemales;
-        adult_female_label->setText(ssaf.str().c_str());
-
-        stringstream sssm;
-        sssm << "Senior males : " << seniorMales;
-        senior_male_label->setText(sssm.str().c_str());
-
-        stringstream sssf;
-        sssf << "Senior females : " << seniorFemales;
-        senior_female_label->setText(sssf.str().c_str());
-
-
-        stringstream ds;
-        ds << "Detections : " << detections;
-        total_detection_label->setText(ds.str().c_str());
-
-
-        emit faceDetected(best);
     }
-
 
     if (recording)
     {
-        std::cout << "Adding to video" << std::endl;
         (*videoOutput).write(result);
-
     }
-
     stats_widget->setFixedHeight(this->height()*0.15);
 
+
+    Point center = Point( result.cols/2, result.rows/2 );
+    double angle = 90.0;
+    double scale = 1;
+
+    Mat rot_mat = getRotationMatrix2D( center, angle, scale );
+    Mat rot_mat2 = getRotationMatrix2D( center, -1.f*angle, scale );
+    warpAffine( result, result, rot_mat, result.size());
+    flip(result,result,0);
+    warpAffine( result, result, rot_mat2, result.size());
+
     cv::cvtColor(result, convertFrame,cv::COLOR_BGR2RGB);
-
-
 
     delete frameToShow;
     frameToShow = NULL;
@@ -250,9 +255,50 @@ void FaceTrackingWindow::timer_tick()
 
     imageLabel->show();
 
-
 }
 
+void FaceTrackingWindow::timer_tick_w()
+{
+    if(write_db() && !lock_writter){
+        db_stack.clear();
+    }
+}
+void FaceTrackingWindow::push_back_db()
+{
+    if(!lock_writter){
+        vector<TrackedFace> temp;
+        for(int i=0;i<faceTracker.objectTracker->trackedFaces.size();i++){
+            temp.push_back(*faceTracker.objectTracker->trackedFaces[i]);
+        }
+        db_stack.push_back(temp);
+    }
 
-//
+}
+bool FaceTrackingWindow::write_db()
+{
 
+    ostringstream convert;   // stream used for the conversion
+    convert << number;
+    string name="datafile_"+convert.str();
+    lock_writter=true;
+    FILE * file = fopen (("Datafile/"+name+".csv").c_str(),"w");
+    for(int i=0;i<db_stack.size();i++){
+
+
+        for(int j=0;j<db_stack[i].size();j++){
+            if(j==0)
+                fprintf(file, "%s,",db_stack[i][0].time_app.c_str());
+            fprintf(file, "P%d,%s,%s,",j,
+                    (db_stack[i].at(j).getCurrentGender()?"Male":"Female"),
+                    (db_stack[i].at(j).getCurrentAge()==1?"Teen":
+                     (db_stack[i].at(j).getCurrentAge()==2?"Adult":"Senior")));
+        }
+        fprintf(file, "\n");
+    }
+    fprintf(file, "\n");
+    number++;
+    number=(number%10);
+    fclose(file);
+    lock_writter=false;
+    return true;
+}

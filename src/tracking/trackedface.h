@@ -48,7 +48,7 @@
 #define BORDER_SIZE_RATIO   4
 
 //1 box for every possible age
-#define AGE_BOX_COUNT 130
+#define AGE_BOX_COUNT 4
 
 #define EVENT_QUEUE_SIZE 10
 
@@ -131,6 +131,7 @@ public:
         {
             if (ageCounts[bestAge] < ageCounts[i])
                 bestAge = i;
+
         }
 
         return bestAge;
@@ -147,7 +148,6 @@ public:
             if (ageCounts[bestAge] < ageCounts[i])
                 bestAge = i;
         }
-
         DetectionInformation info(start_time, stop_time, getCurrentGender(), bestAge);
         return info;
     }
@@ -161,6 +161,8 @@ public:
     {
         return points[0];
     }
+
+    std::string time_app;
 
 private:
 

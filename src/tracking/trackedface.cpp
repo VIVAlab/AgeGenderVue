@@ -25,7 +25,7 @@ TrackedFace::TrackedFace(DetectionEvent& event)
 
     currentLocation = ColoredRect(event.getRect());
     update(event);
-
+    time_app="0";
 
 }
 
@@ -33,15 +33,12 @@ TrackedFace::TrackedFace(DetectionEvent& event)
 //Recenter the face with a recognized face
 void TrackedFace::update(DetectionEvent& event)
 {
-
     lastDetections.insert(lastDetections.begin(), event);
-
 
 
     cv::Rect currentPos = event.getRect();
 
     stop_time = getCurrentDateTime();
-
     stopTrackingTreshold += TRACK_FRAME_DURATION_INCREMENT;
     if (stopTrackingTreshold > MAX_FRAME_TO_STOP)
         stopTrackingTreshold = MAX_FRAME_TO_STOP;
@@ -57,9 +54,7 @@ void TrackedFace::update(DetectionEvent& event)
     {
         notMoved = 0;
     }
-
     currentLocation.updatePos(currentPos);
-
     if (event.getGender() > 0)
         maleVotes++;
     else if (event.getGender() < 0)
@@ -69,14 +64,7 @@ void TrackedFace::update(DetectionEvent& event)
         maleVotes++;
         femaleVotes++;
     }
-
-
     ageCounts[event.getAge()]++;
-
-
-    //recentEvents.push(event);
-    //if (recentEvents.size() >= EVENT_QUEUE_SIZE)
-    //    recentEvents.pop();
 
 
     updatePointFlag = true;
@@ -100,7 +88,6 @@ void TrackedFace::update(DetectionEvent& event)
     }
 
     points[0].resize(k);
-
 
 }
 

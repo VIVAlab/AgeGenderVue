@@ -25,40 +25,19 @@ public:
     void init(bool enableDB, bool enableDrawing);
     cv::Mat track(cv::Mat frame);
 
-
-    DetectionInformation getBestDetection()
-    {
-        DetectionInformation best = objectTracker->getBestDetection();
-
-
-
-        if (bestSpotTime != best.getStartTime())
-        {
-            bestSpotTime = best.getStartTime();
-            spotCount = 0;
-        }
-        else
-        {
-            if ((lastAge != best.getAge() || lastGender != best.getGender()) && spotCount < 15)
-            {
-                lastAge = best.getAge();
-                lastGender = best.getGender();
-                spotCount = 0;
-
-            }
-            spotCount++;
-        }
-
-
-
-        if (spotCount == 15)
-        {
-            return best;
-        }
-
-        return DetectionInformation("0", "0", false, -1);
+    vector<TrackedFace*> getAllDetection(){
+        return objectTracker->trackedFaces;
     }
 
+    vector<DetectionInformation> getBestDetection_m(){
+
+
+        vector<DetectionInformation> bestv = objectTracker->getBestDetection_m();
+
+        return bestv;
+    }
+
+    ObjectTracker* objectTracker;
 
 
 private:
@@ -78,13 +57,13 @@ private:
     char text_female[1024];
     FaceVue* face_obj;
 
-    ObjectTracker* objectTracker;
+
 
     Mat grayFrame;//alternate video frame
     Mat warp_dst;
     IplImage* blank;
 
-     int height, width, channels;
+    int height, width, channels;
 
     bool drawing;
 

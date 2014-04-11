@@ -76,11 +76,11 @@ public:
 
     Mat PatchHistogram(Mat *warp_dst);
 
-    Mat rotate(Mat* image_input, int x_1, int y_1, int x_2, int y_2, int length=70 );
+    Mat rotate(Mat* image_input, int x_1, int y_1, int x_2, int y_2, int length=66 );
 
     int SVM_Predictor(Mat* test_image);
     int gender_predictor(Mat *test_image);
-    float/*Point2i*/ age_predictor(Mat *test_image);
+    int age_predictor(Mat *test_image);
 
     bool Load_Gender_Points(string file_name);
 

@@ -22,7 +22,7 @@ public slots:
 
 private:
     QLabel* imageLabel;
-    QPixmap image;
+    QPixmap* image;
 
     QHBoxLayout* layout;
     

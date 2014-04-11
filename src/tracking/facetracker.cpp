@@ -52,7 +52,6 @@ cv::Mat FaceTracker::track(cv::Mat frame)
 
 
 
-
     //Do some conversions for various different functions
     cvtColor(frame,grayFrame,CV_RGB2GRAY);
 
@@ -68,10 +67,8 @@ cv::Mat FaceTracker::track(cv::Mat frame)
 
     //Create an empty image to send to the face detector
     blank = cvCreateImage(cvSize(image.width,image.height),IPL_DEPTH_8U,1);
-
     //Detects probable face locations
     rects = face_obj->detect_ALLFacesROI(&image, blank);
-
     //Face tracking
     if(rects.size())
     {
@@ -109,7 +106,7 @@ cv::Mat FaceTracker::track(cv::Mat frame)
 
                 //Align the face
                 int genderVal=0;
-                double ageVal=0;
+                int ageVal=0;
 
                 warp_dst=TEMP->rotate(
                             &grayFrame,
@@ -144,7 +141,6 @@ cv::Mat FaceTracker::track(cv::Mat frame)
                 genderVector.push_back(genderVal);
             }
         }
-
         //Remove all the false detects
         rects.resize(k);
 
@@ -152,13 +148,9 @@ cv::Mat FaceTracker::track(cv::Mat frame)
         //the faceTracker to update the positions and information of all tracked
         //faces
         objectTracker->updateTracking(DetectionEvent::generate(rects, stubbedAgeVector, genderVector));
-
     }
-
     //Update the tracking points of the face tracker
     objectTracker->tick(frame);
-
-
     if (drawing)
     {
     //Get the rectangles of tracked faces, as well as their genders
@@ -202,29 +194,19 @@ cv::Mat FaceTracker::track(cv::Mat frame)
 
         char currentAge[100];
 
-        if (ages[i] == 0)
-        {
-            snprintf(currentAge,sizeof(currentAge),"");
-        }
-
-        if (ages[i] == 1)
+        if (ages[i] < 1.5)
         {
             snprintf(currentAge,sizeof(currentAge),"Teen");
         }
 
-        if (ages[i] == 2)
+        else if (ages[i] < 2.5)
         {
             snprintf(currentAge,sizeof(currentAge),"Adult");
         }
 
-        if (ages[i] == 3)
+        else if (ages[i] > 2.5)
         {
             snprintf(currentAge,sizeof(currentAge),"Senior");
-        }
-
-        if (ages[i] == 4)
-        {
-            snprintf(currentAge,sizeof(currentAge),"");
         }
 
 
@@ -232,14 +214,8 @@ cv::Mat FaceTracker::track(cv::Mat frame)
 
         putBoldedText(frame, currentAge, p22, size);
     }
-
     std::stringstream ss;
     ss << objectTracker->getFaceCountSoFar();
-
-//    std::string faceCount = ss.str();
-
-//    rectangle(frame, Point(0, 0), Point(140, 100), Scalar(0, 0, 0), -1);
-//    putText(frame,faceCount.c_str(),facecountLocation,CV_FONT_HERSHEY_PLAIN, 6, CV_RGB(255,0,0));
 
     }
 

@@ -25,8 +25,7 @@
 //Constants used for face tracking
 #define MULTIPLE_DETECT_DELTA 25
 
-//#define MAX_DIST_BETWEEN_DETECTS 75
-#define MAX_DIST_BETWEEN_DETECTS 150
+#define MAX_DIST_BETWEEN_DETECTS 150//75
 
 
 class ObjectTracker
@@ -54,25 +53,31 @@ class ObjectTracker
             return foundFacesTotal;
         }
 
-
-        DetectionInformation getBestDetection()
+        vector<DetectionInformation> getBestDetection_m()
         {
-            TrackedFace* bestFace = NULL;
             int oldest = -1;
+            vector<DetectionInformation> x;
             for(std::vector<TrackedFace*>::iterator it = trackedFaces.begin(); it != trackedFaces.end(); ++it)
             {
-                if ((*it)->getTotalTicks() > oldest)
+
+                (*it)->time_app=getCurrentDateTime_c();
+                if ((*it)->getTotalTicks() ==15)
                 {
                     oldest = (*it)->getTotalTicks();
-                    bestFace = (*it);
+                    x.push_back((*it)->getDetectionInformation());
+
                 }
             }
 
-            if (oldest == -1)
-                return DetectionInformation("0","0",false,-1);
+            if (oldest == -1){
+                x.push_back(DetectionInformation("0","0",false,-1));
+                return x;
+            }
 
-            return bestFace->getDetectionInformation();
+            return x;
         }
+
+
 
         //Returns a rect for every tracked face
         std::vector<ColoredRect> getFaceRectangles()
@@ -120,8 +125,19 @@ class ObjectTracker
 
         //Return the current number of tracked faces
         int getTrackedFaceCount(){  return trackedFaces.size(); }
+        std::vector<TrackedFace*> trackedFaces;
 
+        std::string getCurrentDateTime_c() {
+            time_t     now = time(0);
+            struct tm  tstruct;
+            char       buf[80];
+            tstruct = *localtime(&now);
+            // Visit http://en.cppreference.com/w/cpp/chrono/c/strftime
+            // for more information about date/time format
+            strftime(buf, sizeof(buf), "%Y-%m-%d.%X", &tstruct);
 
+            return buf;
+        }
 
     private:
         double getDistanceBetweenRectsRect(cv::Rect first,cv::Rect other)
@@ -142,7 +158,7 @@ class ObjectTracker
         }
 
         //Vector of tracked faces
-        std::vector<TrackedFace*> trackedFaces;
+
 
         std::vector<int> matchRects(std::vector<DetectionEvent> rects);
 

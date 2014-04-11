@@ -369,6 +369,7 @@ LBPHISTOGRAM::LBPHISTOGRAM(){
     XR_eye=134;
     YL_eye=66;
     YR_eye=66;
+
     numOPtch=5900;
     nOtrain=1972;//5000;
     //Train_File="Train.bin";
@@ -463,7 +464,6 @@ Mat LBPHISTOGRAM::AGE_descriptor(Mat *warp_dst){
         Mat ROI;
         int BLOCK_NUM=warp_dst->rows/age_points[i].blk_siz;
         int offset=floor((warp_dst->rows-BLOCK_NUM*age_points[i].blk_siz)/2);
-        //cout<<age_points[i].radius<<"_"<<age_points[i].x<<"_"<<age_points[i].y<<"_"<<age_points[i].blk_siz<<endl;
         max = Local_LBPFilter(warp_dst,ROI, 1, 8, age_points[i].radius,age_points[i].x+offset,age_points[i].y+offset,age_points[i].blk_siz); //
         ROI.convertTo(ROI,CV_8UC1);
         Mat hist = ROItoHistogram(ROI, 0, max);
@@ -471,9 +471,7 @@ Mat LBPHISTOGRAM::AGE_descriptor(Mat *warp_dst){
         cv::transpose(hist,hist);
 
         hist.convertTo(hist, DataType<int>::type);
-       // cout<<hist<<endl;
         norm_1(hist, hist2);
-        //cout<<hist2<<endl;
         float *basePtr_hist2 = (float*)hist2.data;
         for(int d = 0; d < hist2.cols && histInd < histograms.cols; d++)//each histogram bin
         {
@@ -490,9 +488,7 @@ Mat LBPHISTOGRAM::rotate(Mat *image_input, int x_1, int y_1, int x_2, int y_2, i
 {
     is_rotated=false;
     Mat image;
-    //image_input->copyTo(image);
     image=image_input->clone();
-    //imwrite(to_string(x_1)+"_"+to_string(y_1)+"_"+to_string(x_2)+"_"+to_string(y_2)+".jpg",image);
     double angle=-atan((double(y_2-y_1))/(double(x_2-x_1)))*(180.0/(4.0*atan(1.0)));
 
     Point2f src_center(x_1, y_1);
@@ -502,7 +498,6 @@ Mat LBPHISTOGRAM::rotate(Mat *image_input, int x_1, int y_1, int x_2, int y_2, i
     Mat rotated_img(Size(image.size().width, image.size().height), image.type());
 
     warpAffine(image, rotated_img, rot_matrix, rotated_img.size());
-    //imwrite("b.jpg",rotated_img);
     Mat scaled_img;
     int past_length=sqrt(pow((x_2-x_1),2)+pow((y_2-y_1),2));
     double ratio=((double)past_length/(double)length);
@@ -527,17 +522,13 @@ void LBPHISTOGRAM::norm_1(Mat input, Mat &output){
 
     output=Mat::zeros(input.rows,input.cols,DataType<float>::type);
     int* basePtr_input=(int*)input.data;
-    float sum=0;
     float* basePtr_output=(float*)output.data;
-//    for(int i=0;i<input.cols;i++)
-//        sum+=*(basePtr_input+i);
     for(int i=0;i<input.cols;i++)
         *(basePtr_output+i)=*(basePtr_input+i);//sum
 }
 
 void LBPHISTOGRAM::SVM_LBP_Train(){
 
-    //MYSVM.load("Models//SVM-model.txt");
     GENDER_SVM.load("Models//gender_svm.bin");
     AGE_SVM.load("Models//age_svm.bin");
 }
@@ -552,7 +543,6 @@ int LBPHISTOGRAM::SVM_Predictor(Mat *test_image){
     for(int j=0;j<numOPtch;j++){
         *(Ptr_testMat+j)=*(Ptr_testMat_+j);
     }
-    //cout<<*(Ptr_testMat+0)<<"_"<<*(Ptr_testMat+1200)<<"_"<<*(Ptr_testMat+5899)<<endl;
     float response=MYSVM.predict(testMat);
     if(response>0)
         val=1;
@@ -563,32 +553,25 @@ int LBPHISTOGRAM::SVM_Predictor(Mat *test_image){
 int LBPHISTOGRAM::gender_predictor(Mat *test_image){
 
     int val=0;
-   // cout<<"gender des"<<endl;
     Mat testMat_=GENDER_descriptor(test_image);
     Mat testMat=Mat::zeros(1,gender_numOPtch,DataType<float>::type);
     float* Ptr_testMat=(float*)testMat.data;
     float* Ptr_testMat_=(float*)testMat_.data;
     for(int j=0;j<gender_numOPtch;j++){
         *(Ptr_testMat+j)=sqrt(*(Ptr_testMat_+j));
-      //  cout<<*(Ptr_testMat+j)<<endl;
     }
-    //cout<<testMat.rows<<"_"<<testMat.cols<<endl;
-   // cout<<"gender predict"<<endl;
     float response=GENDER_SVM.predict(testMat);
     if(response>0)
         val=1;
     else
         val=-1;
-    //cout<<"gender done"<<endl;
     return val;
 }
-float LBPHISTOGRAM::age_predictor(Mat *test_image){
+int LBPHISTOGRAM::age_predictor(Mat *test_image){
 
-    //int val=0;
     Point2i val;
     val.x=0;
     val.y=0;
-    //cout<<"age des"<<endl;
     Mat testMat_=AGE_descriptor(test_image);
 
     Mat testMat=Mat::zeros(1,age_numOPtch,DataType<float>::type);
@@ -597,29 +580,16 @@ float LBPHISTOGRAM::age_predictor(Mat *test_image){
     for(int j=0;j<age_numOPtch;j++){
         *(Ptr_testMat+j)=sqrt(*(Ptr_testMat_+j));
     }
-   // cout<<"age predict"<<endl;
     float response=AGE_SVM.predict(testMat);
-    //cout<<response<<endl;
-    //    if(response==1){
-    //        val.x=0;
-    //        val.y=12;
-    //    }
-    //    else if(response==2){
-    //        val.x=13;
-    //        val.y=36;
-    //    }
-    //    else if(response==3){
-    //        val.x=37;
-    //        val.y=65;
-    //    }
-    //    else if(response==4){
-    //        val.x=66;
-    //        val.y=90;
-    //    }
+    int response_i=0;
+    if(response<1.5)
+        response_i=1;
+    else if(response<2.5)
+        response_i=2;
+    else
+        response_i=3;
 
-    //    return val;
-   // cout<<"age done"<<endl;
-    return response;
+    return response_i;
 }
 
 

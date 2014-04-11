@@ -63,7 +63,9 @@ public slots:
     
 
 private slots:
-    void timer_tick();
+    void timer_tick_m();
+    void timer_tick_w();
+
     void toggle_recording();
 
 signals:
@@ -96,10 +98,15 @@ private:
     int seniorMales;
     int seniorFemales;
     int detections;
+    int number;
 
     bool recording;
+    bool lock_writter;
     VideoWriter* videoOutput;
 
+    vector<vector <TrackedFace> >  db_stack;
+    void push_back_db();
+    bool write_db();
 
 };
 

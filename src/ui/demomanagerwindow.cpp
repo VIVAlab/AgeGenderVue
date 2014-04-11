@@ -61,7 +61,6 @@ void DemoManagerWindow::launch_ad_demo()
 
 void DemoManagerWindow::face_detected(DetectionInformation detectedFace)
 {
-//    std::cout << detectedFace.getAge() << std::endl;
 
     if (detectedFace.getGender() && detectedFace.getAge() == 1)
         adDemoWindow->change_ad("teen_male.jpg");

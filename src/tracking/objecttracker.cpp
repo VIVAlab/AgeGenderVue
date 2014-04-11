@@ -202,6 +202,7 @@ void ObjectTracker::updateTracking(std::vector<DetectionEvent> rects)
             if (delta < MULTIPLE_DETECT_DELTA)
             {
                 print_info("Avoided duplicate detection");
+                std::cout<<"Avoided duplicate detection"<<std::endl;
                 goto break_out;
             }
         }
@@ -209,7 +210,6 @@ void ObjectTracker::updateTracking(std::vector<DetectionEvent> rects)
         uniqueRects.push_back(rects[i]);
         break_out: continue;
     }
-
 
     vector<int> bestIndexForEachRect = matchRects(uniqueRects);
     for (int i = 0; i < bestIndexForEachRect.size(); i++)
@@ -230,7 +230,6 @@ void ObjectTracker::updateTracking(std::vector<DetectionEvent> rects)
             this->trackedFaces[index]->update(uniqueRects[i]);
         }
     }
-
 }
 
 
