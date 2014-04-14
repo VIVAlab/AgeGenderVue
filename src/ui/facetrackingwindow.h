@@ -17,8 +17,7 @@ class FaceTrackingWindow;
 #include <opencv2/core/core.hpp>
 #include <opencv2/highgui/highgui.hpp>
 
-
-
+#include <direct.h>
 
 #include "objecttracker.h"
 #include "utils.h"
@@ -102,10 +101,13 @@ private:
 
     bool recording;
     bool lock_writter;
+
     VideoWriter* videoOutput;
 
     vector<vector <TrackedFace> >  db_stack;
+
     void push_back_db();
+    void frame_flip(Mat &frame);
     bool write_db();
 
 };

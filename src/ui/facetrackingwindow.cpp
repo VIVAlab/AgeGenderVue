@@ -27,6 +27,9 @@ FaceTrackingWindow::FaceTrackingWindow(QWidget *parent, DemoManagerWindow *windo
     }
 
 
+    std::cout<<mkdir("Database")<<std::endl;
+
+
     frameToShow = NULL;
 
     number=0;
@@ -151,6 +154,21 @@ FaceTrackingWindow::~FaceTrackingWindow()
     capture.release();
 }
 
+void FaceTrackingWindow::frame_flip(Mat &frame){
+
+    Point center = Point( frame.cols/2, frame.rows/2 );
+    double angle = 90.0;
+    double scale = 1;
+
+    Mat rot_mat = getRotationMatrix2D( center, angle, scale );
+    Mat rot_mat2 = getRotationMatrix2D( center, -1.f*angle, scale );
+    warpAffine( frame, frame, rot_mat, frame.size());
+    flip(frame,frame,0);
+    warpAffine( frame, frame, rot_mat2, frame.size());
+}
+
+
+
 void FaceTrackingWindow::timer_tick_m()
 {
     //read next frame if any
@@ -159,7 +177,7 @@ void FaceTrackingWindow::timer_tick_m()
         cout << "Could not read frame" << endl;
         return;
     }
-
+    frame_flip(frame);
     cv::Mat result = faceTracker.track(frame);
     vector<DetectionInformation> bestv = faceTracker.getBestDetection_m();
     push_back_db();
@@ -236,15 +254,6 @@ void FaceTrackingWindow::timer_tick_m()
     stats_widget->setFixedHeight(this->height()*0.15);
 
 
-    Point center = Point( result.cols/2, result.rows/2 );
-    double angle = 90.0;
-    double scale = 1;
-
-    Mat rot_mat = getRotationMatrix2D( center, angle, scale );
-    Mat rot_mat2 = getRotationMatrix2D( center, -1.f*angle, scale );
-    warpAffine( result, result, rot_mat, result.size());
-    flip(result,result,0);
-    warpAffine( result, result, rot_mat2, result.size());
 
     cv::cvtColor(result, convertFrame,cv::COLOR_BGR2RGB);
 
@@ -281,7 +290,7 @@ bool FaceTrackingWindow::write_db()
     convert << number;
     string name="datafile_"+convert.str();
     lock_writter=true;
-    FILE * file = fopen (("Datafile/"+name+".csv").c_str(),"w");
+    FILE * file = fopen (("Database//"+name+".csv").c_str(),"w");
     for(int i=0;i<db_stack.size();i++){
 
 

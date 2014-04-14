@@ -29,7 +29,7 @@ void FaceTracker::init(bool enableDB, bool enableDrawing)
     if (enableDB)
     {
         //Load the database or create a new one if it doesn't exist
-        database = new SqliteDB("results.db");
+        database = new SqliteDB("Database//results.db");
 
         //Initialize the facetrracker with a database so that it saves the results
         //within. If you initialize it without one, it won't save results.
