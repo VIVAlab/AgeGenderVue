@@ -26,8 +26,7 @@ FaceTrackingWindow::FaceTrackingWindow(QWidget *parent, DemoManagerWindow *windo
         throw "No capture";
     }
 
-
-    std::cout<<mkdir("Database")<<std::endl;
+    mkdir("Database"); //Database folder
 
 
     frameToShow = NULL;
