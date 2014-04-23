@@ -180,12 +180,19 @@ void FaceTrackingWindow::timer_tick_m()
     cv::Mat result = faceTracker.track(frame);
     vector<DetectionInformation> bestv = faceTracker.getBestDetection_m();
     push_back_db();
+    int best_demog_idx=-1,best_demog_age=-1;
+
     for(int i=0;i<bestv.size();i++){
             DetectionInformation best=bestv[i];
 
         //Good detection
         if (best.getAge() != -1)
         {
+            if(best.getAge()>best_demog_age){
+                best_demog_idx=i;
+                best_demog_age=best.getAge();
+            }
+
             detections++;
             if (best.getGender() && best.getAge() == 1)
             {
@@ -245,6 +252,8 @@ void FaceTrackingWindow::timer_tick_m()
 
         }
     }
+    if(best_demog_idx!=-1)
+        emit faceDetected(bestv[best_demog_idx]);
 
     if (recording)
     {

@@ -19,7 +19,8 @@ AdDemoWindow::AdDemoWindow(QWidget *parent) :
 
  void AdDemoWindow::change_ad(std::string filename)
  {
-    std::string concatedname = "ads/" + filename;
+
+    std::string concatedname = "ads//" + filename;
     imageLabel->setPixmap(QPixmap(concatedname.c_str()));
     imageLabel->show();
 
