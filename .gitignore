@@ -1,0 +1,13 @@
+GenderRecognition.pro
+GenderRecognition.pro.autosave
+GenderRecognition.pro.user
+Makefile
+Makefile.Debug
+Makefile.Release
+object_script.GenderRecognition.Debug
+object_script.GenderRecognition.Release
+debug
+release
+Models
+results.db
+
