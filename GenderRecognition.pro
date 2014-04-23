@@ -5,13 +5,11 @@
 #-------------------------------------------------
 
 QT       += core
-
 QT       += gui
-
+QT       += widgets
 TARGET = GenderRecognition
-CONFIG   += console
+#CONFIG   -= console
 CONFIG   -= app_bundle
-
 
 
 #Custom configuration options to aid modifying build
@@ -22,8 +20,12 @@ CONFIG += dynamic_build
 
 #OPENCV_INSTALL_DIR = C:/opencv241Built/install/
 
-OPENCV_DIR = C:/opencv241Dynamic/
-OPENCV_INSTALL_DIR = $$OPENCV_DIR/install/
+
+#OPENCV_DIR = C:/opencv241Dynamic/
+#OPENCV_INSTALL_DIR = $$OPENCV_DIR/install/
+#OPENCV_3RD_PARTY_DIR = $$OPENCV_DIR/3rdparty/lib/
+OPENCV_DIR = C:/opencv-2.4.8/build/
+OPENCV_INSTALL_DIR = $$OPENCV_DIR
 OPENCV_3RD_PARTY_DIR = $$OPENCV_DIR/3rdparty/lib/
 
 #OPENCV_DIR = H:/VivaWork/opencv241Built/
@@ -100,98 +102,38 @@ LIBS += -L$$OPENCV_INSTALL_DIR/lib
 LIBS += -L$$BOOST_DIR/lib
 
 
-static_build {
-
-    LIBS +=$$OPENCV_INSTALL_DIR/lib/libopencv_imgproc241.a
-    LIBS +=$$OPENCV_INSTALL_DIR/lib/libopencv_calib3d241.a
-    LIBS +=$$OPENCV_INSTALL_DIR/lib/libopencv_video241.a
-    LIBS +=$$OPENCV_INSTALL_DIR/lib/libopencv_core241.a
-    LIBS +=$$OPENCV_INSTALL_DIR/lib/libopencv_imgproc241.a
-    LIBS +=$$OPENCV_INSTALL_DIR/lib/libopencv_video241.a
-    LIBS +=$$OPENCV_INSTALL_DIR/lib/libopencv_contrib241.a
-    LIBS +=$$OPENCV_INSTALL_DIR/lib/libopencv_features2d241.a
-    LIBS +=$$OPENCV_INSTALL_DIR/lib/libopencv_legacy241.a
-    LIBS +=$$OPENCV_INSTALL_DIR/lib/libopencv_ml241.a
-    LIBS +=$$OPENCV_INSTALL_DIR/lib/libopencv_nonfree241.a
-    LIBS +=$$OPENCV_INSTALL_DIR/lib/libopencv_objdetect241.a
-    LIBS +=$$OPENCV_INSTALL_DIR/lib/libopencv_videostab241.a
-    LIBS +=$$OPENCV_INSTALL_DIR/lib/libopencv_highgui241.a
-
-}
-
-
-
-
 INCLUDEPATH += $$SQLITE_LIB_DIR
 LIBS += $$SQLITE_LIB_DIR/sqlite3.dll
 
 
+    LIBS +=$$OPENCV_INSTALL_DIR/lib/libopencv_core248d.dll.a
+    LIBS +=$$OPENCV_INSTALL_DIR/lib/libopencv_highgui248d.dll.a
+    LIBS +=$$OPENCV_INSTALL_DIR/lib/libopencv_imgproc248d.dll.a
+    LIBS +=$$OPENCV_INSTALL_DIR/lib/libopencv_features2d248d.dll.a
+    LIBS +=$$OPENCV_INSTALL_DIR/lib/libopencv_calib3d248d.dll.a
+    LIBS +=$$OPENCV_INSTALL_DIR/lib/libopencv_ml248d.dll.a
 
-dynamic_build {
-
-
-    LIBS +=$$OPENCV_INSTALL_DIR/lib/libopencv_core241.dll.a
-    LIBS +=$$OPENCV_INSTALL_DIR/lib/libopencv_highgui241.dll.a
-    LIBS +=$$OPENCV_INSTALL_DIR/lib/libopencv_imgproc241.dll.a
-    LIBS +=$$OPENCV_INSTALL_DIR/lib/libopencv_features2d241.dll.a
-    LIBS +=$$OPENCV_INSTALL_DIR/lib/libopencv_calib3d241.dll.a
-    LIBS +=$$OPENCV_INSTALL_DIR/lib/libopencv_ml241.dll.a
-
-    LIBS +=$$OPENCV_INSTALL_DIR/lib/libopencv_contrib241.dll.a
-    LIBS +=$$OPENCV_INSTALL_DIR/lib/libopencv_features2d241.dll.a
-    LIBS +=$$OPENCV_INSTALL_DIR/lib/libopencv_flann241.dll.a
-    LIBS +=$$OPENCV_INSTALL_DIR/lib/libopencv_gpu241.dll.a
-    LIBS +=$$OPENCV_INSTALL_DIR/lib/libopencv_legacy241.dll.a
-    LIBS +=$$OPENCV_INSTALL_DIR/lib/libopencv_ml241.dll.a
-    LIBS +=$$OPENCV_INSTALL_DIR/lib/libopencv_nonfree241.dll.a
-    LIBS +=$$OPENCV_INSTALL_DIR/lib/libopencv_objdetect241.dll.a
-    LIBS +=$$OPENCV_INSTALL_DIR/lib/libopencv_photo241.dll.a
-    LIBS +=$$OPENCV_INSTALL_DIR/lib/libopencv_ts241.a
-    LIBS +=$$OPENCV_INSTALL_DIR/lib/libopencv_video241.dll.a
-    LIBS +=$$OPENCV_INSTALL_DIR/lib/libopencv_stitching241.dll.a
-    LIBS +=$$OPENCV_INSTALL_DIR/lib/libopencv_videostab241.dll.a
-    LIBS +=$$OPENCV_INSTALL_DIR/lib/libopencv_highgui241.dll.a
-
-}
-
-##LIBS +=$$PWD/Face_api/facevue.o
-##LIBS +=$$PWD/Face_api/flandmark_detector.o
-##LIBS +=$$PWD/Face_api/cascadedetect.o
-
-#LIBS +=$$PWD/opencv_dlls/libopencv_imgproc241.a##2?
-#LIBS +=$$PWD/opencv_dlls/libopencv_calib3d241.a
-#LIBS +=$$PWD/opencv_dlls/libopencv_video241.a###2?
-#LIBS +=$$PWD/opencv_dlls/libopencv_core241.a
-#LIBS +=$$PWD/opencv_dlls/libopencv_imgproc241.a
-#LIBS +=$$PWD/opencv_dlls/libopencv_video241.a
-
-#LIBS +=$$PWD/opencv_dlls/libopencv_contrib241.a
-#LIBS +=$$PWD/opencv_dlls/libopencv_features2d241.a
-#LIBS +=$$PWD/opencv_dlls/libopencv_legacy241.a
-#LIBS +=$$PWD/opencv_dlls/libopencv_ml241.a
-#LIBS +=$$PWD/opencv_dlls/libopencv_nonfree241.a
-#LIBS +=$$PWD/opencv_dlls/libopencv_objdetect241.a
-#LIBS +=$$PWD/opencv_dlls/libopencv_videostab241.a
-#LIBS +=$$PWD/opencv_dlls/libopencv_highgui241.a
-#LIBS +=$$PWD/opencv_dlls/libvfw32.a
-#LIBS +=$$PWD/opencv_dlls/libcomctl32.a
-#LIBS +=$$PWD/opencv_dlls/libavcodec.a
-#LIBS +=$$PWD/opencv_dlls/libavformat.a
-#LIBS +=$$PWD/opencv_dlls/libavcore64.a
-#LIBS +=$$PWD/opencv_dlls/libole32.a
-#LIBS +=$$PWD/opencv_dlls/libavifil32.a
-#LIBS +=$$PWD/opencv_dlls/libuuid.a
-#LIBS +=$$PWD/opencv_dlls/liboleaut32.a
-#LIBS +=$$PWD/opencv_dlls/libolepro32.a
+    LIBS +=$$OPENCV_INSTALL_DIR/lib/libopencv_contrib248d.dll.a
+    LIBS +=$$OPENCV_INSTALL_DIR/lib/libopencv_features2d248d.dll.a
+    LIBS +=$$OPENCV_INSTALL_DIR/lib/libopencv_flann248d.dll.a
+    LIBS +=$$OPENCV_INSTALL_DIR/lib/libopencv_gpu248d.dll.a
+    LIBS +=$$OPENCV_INSTALL_DIR/lib/libopencv_legacy248d.dll.a
+    LIBS +=$$OPENCV_INSTALL_DIR/lib/libopencv_ml248d.dll.a
+    LIBS +=$$OPENCV_INSTALL_DIR/lib/libopencv_nonfree248d.dll.a
+    LIBS +=$$OPENCV_INSTALL_DIR/lib/libopencv_objdetect248d.dll.a
+    LIBS +=$$OPENCV_INSTALL_DIR/lib/libopencv_photo248d.dll.a
+    LIBS +=$$OPENCV_INSTALL_DIR/lib/libopencv_ts248d.a
+    LIBS +=$$OPENCV_INSTALL_DIR/lib/libopencv_video248d.dll.a
+    LIBS +=$$OPENCV_INSTALL_DIR/lib/libopencv_stitching248d.dll.a
+    LIBS +=$$OPENCV_INSTALL_DIR/lib/libopencv_videostab248d.dll.a
+    LIBS +=$$OPENCV_INSTALL_DIR/lib/libopencv_highgui248d.dll.a
 
 
-
-
-LIBS +=$$OPENCV_3RD_PARTY_DIR/liblibjasper.a
-LIBS +=$$OPENCV_3RD_PARTY_DIR/liblibtiff.a
-LIBS +=$$OPENCV_3RD_PARTY_DIR/libzlib.a
-LIBS +=$$OPENCV_3RD_PARTY_DIR/liblibpng.a
-LIBS +=$$OPENCV_3RD_PARTY_DIR/liblibjpeg.a
+LIBS +=$$OPENCV_3RD_PARTY_DIR/liblibjasperd.a
+LIBS +=$$OPENCV_3RD_PARTY_DIR/liblibtiffd.a
+LIBS +=$$OPENCV_3RD_PARTY_DIR/libzlibd.a
+LIBS +=$$OPENCV_3RD_PARTY_DIR/liblibpngd.a
+LIBS +=$$OPENCV_3RD_PARTY_DIR/liblibjpegd.a
 
 
 
@@ -206,8 +148,4 @@ LIBS += -lavifil32
 LIBS += -luuid
 LIBS += -loleaut32
 LIBS += -lolepro32
-
-#LIBS +=$$PWD/Face_api/libFaceVue.a
-
-
 

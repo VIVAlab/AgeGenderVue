@@ -20,7 +20,7 @@ bool FaceVue::create_Database(vector<string> &filename)
 
     if (!(recognition->LoadImages(filename)))
     {
-        printf("At least one file is missing '%s'\n",filename);
+        //printf("At least one file is missing '%s'\n",filename);
         return false;
     }
     else
@@ -89,7 +89,7 @@ bool FaceVue::load_Detection_Model(const string &filename)
         return true;
     else
     {
-        printf("Couldn't load Face detector '%s'\n",filename);
+        //printf("Couldn't load Face detector '%s'\n",filename);
         return false;
     }
 }

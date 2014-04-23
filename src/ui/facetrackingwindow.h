@@ -4,12 +4,13 @@
 
 class FaceTrackingWindow;
 
-#include <QWidget>
+#include <QtWidgets/QWidget>
+#include <QtWidgets/QPushButton>
 #include <QTimer>
-#include <QLabel>
-#include <QsizePolicy>
-#include <QVBoxLayout>
-#include <QHBoxLayout>
+#include <QtWidgets/QLabel>
+#include <QtWidgets/QsizePolicy>
+#include <QtWidgets/QVBoxLayout>
+#include <QtWidgets/QHBoxLayout>
 
 #include <iostream>
 #include <sstream>

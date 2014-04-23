@@ -3,7 +3,7 @@
 
 class DemoManagerWindow;
 
-#include <QWidget>
+#include <QtWidgets/QWidget>
 #include <QtGui>
 
 #include "facetrackingwindow.h"
