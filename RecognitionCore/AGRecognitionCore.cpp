@@ -32,7 +32,6 @@ vector<AGPacket> AGRecognitionCore::Face_Process(Mat frame, vector<FaceContent> 
     {
         
         for(vector<FaceContent>::iterator it = faces.begin(); it != faces.end(); it++) {
-            /* std::cout << *it; ... */
             std::map<int, PersonOnTrack*>::iterator i = inFrameFaces.find(it->faceID);
 			
 				if (i != inFrameFaces.end()){

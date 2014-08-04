@@ -28,7 +28,7 @@ class SqliteDB : public DBInterface
 
         //Implements the interface
 		void writeDetection(AGPacket info);
-		void appendINSERTION(AGPacket info);	
+		void appendINSERTION(AGPacket info, string* lastStr);	
 		void writeINdb();
 	   int counter;
 	   

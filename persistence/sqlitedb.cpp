@@ -42,9 +42,9 @@ SqliteDB::~SqliteDB()
 }
 //Write demographic information regarding each face which has been detected
 
-void SqliteDB::appendINSERTION(AGPacket info){
+void SqliteDB::appendINSERTION(AGPacket info, string* lastStr){
 
-	std::string sql;
+	std::string sql1,sql3,sql2="";
 
 	std::stringstream ss;
 	ss << info.ageCatg;
@@ -72,26 +72,35 @@ void SqliteDB::appendINSERTION(AGPacket info){
     //be a prepared statement or at least escaped, even
     //if the risk of attack is minimal.
 	
-    sql = "INSERT INTO RESULTS (CURRENT_TIME,ID,AGE,GENDER)" \
+    sql1 = "INSERT INTO RESULTS (CURRENT_TIME,ID,AGE,GENDER)" \
             "VALUES ('";
-	sql.append(info.currentTime);
-	sql.append("-");
-	sql.append(counters);
-	sql.append("',");
-	sql.append(ID);
-	sql.append(",");
-    sql.append(age);
-    sql.append(",'");
-    sql.append(gender);
-    sql.append("');");
-
-	CommandStr.append(sql);
+	sql1.append(info.currentTime);
+	sql3="-";
+	sql3.append(counters);
+	sql2.append("',");
+	sql2.append(ID);
+	sql2.append(",");
+    sql2.append(age);
+    sql2.append(",'");
+    sql2.append(gender);
+    sql2.append("');");
+	
+	if((*lastStr).size()!=0){
+		if(sql2.compare((*lastStr).substr((*lastStr).size()-11,(*lastStr).size()))==0){
+			if(sql1.compare((*lastStr).substr(0,76))==0)
+				return;
+		}
+	}
+	sql1.append(sql3);
+	sql1.append(sql2);
+	(*lastStr)=sql1;
+	CommandStr.append(sql1);
 	counter++;
+	
 }
 
 void SqliteDB::writeINdb(){
 #ifndef STUB_SQL
-	cout<<"bozi"<<endl;
     char *zErrMsg = 0;
     int rc;
 
@@ -113,7 +122,7 @@ void SqliteDB::writeDetection(AGPacket info)
     char *zErrMsg = 0;
     std::string sql;
     int rc;
-	//std::cout<<"hey"<<std::endl;
+	
     //Get the age in a string format for easy writing
 	
     std::stringstream ss;

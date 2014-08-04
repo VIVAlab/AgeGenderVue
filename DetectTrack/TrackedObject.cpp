@@ -156,7 +156,7 @@ TrackingStatus TrackedObject::Track(Mat& currentFrame, Mat& previousFrame){
     //here is another option, u can use their min and max! instead of using average its better to use min and max!
     currentLocation.currentrect.x = averageX - (currentLocation.currentrect.width/2);
     currentLocation.currentrect.y = averageY - (currentLocation.currentrect.height/2);
-    //std::cout<<"min:"<<minX<<"-"<<minY<<std::endl;
+    
     //int pwoctave=currentLocation.width/2;
     //int phoctave=currentLocation.height/2;
     //currentLocation.x = minX - (pwoctave/2);

@@ -129,7 +129,6 @@ public:
 
     void putItem() {
         
-		cout<<"P1"<<endl;
 		//cap>>frame;
         Mat img;
         if(camera_type == FIREFLY)
@@ -142,7 +141,7 @@ public:
             cvtColor(img, frame, CV_GRAY2RGB);
        else
             frame = img;
-	   cout<<"P2"<<endl;
+
 		flip(frame,frame,1);
 		cvtColor(frame,grayFrame,CV_RGB2GRAY);
 		item->frame=frame.clone();
@@ -156,14 +155,14 @@ public:
 		mutex_1.lock();
 		queue_face_AGEGENDER.push(item);
         mutex_1.unlock();
-		cout<<"P3"<<endl;
+		
 		SHOW: showFrame(item->rects);
-		cout<<"P4"<<endl;
+		
     }
     
 
     void processItem() {
-		cout<<"C1"<<endl;
+		
 		vector<AGPacket> rects_inf;
         item2 = NULL;
 		int size=0;
@@ -174,7 +173,7 @@ public:
 			//mutex_1.unlock(); // If missing -> Candidate for a deadlock!
 			return;
         } else {
-			cout<<"C2"<<endl;
+			
 			mutex_1.lock();
 			if(queue_face_AGEGENDER.size()>STACK_OVERFLOW_SIZE)
 			{
@@ -184,7 +183,7 @@ public:
 			item2 = queue_face_AGEGENDER.front();
 			queue_face_AGEGENDER.pop();
 			mutex_1.unlock();
-			cout<<"C3"<<endl;
+			
 			string currentTime=getCurrentDateTime();
 			rects_inf= AG_obj.Face_Process(item2->frame,item2->rects);
 			for(int i=0;i<rects_inf.size();i++)
@@ -193,7 +192,7 @@ public:
 				mutex_4.lock();
 				DB_Buffer.push_back(rects_inf);
 				mutex_4.unlock();
-		cout<<"C4"<<endl;
+		
 			if(rects_inf.size()!=0){
 			mutex_2.lock();
 				Update_facesINframe(rects_inf);
@@ -201,7 +200,6 @@ public:
 			}
 				
 			
-            cout<<"C5"<<endl;
         }
         
     }
@@ -214,18 +212,15 @@ public:
     }
     
 	void Write_DB(){
-		int cc=0;
 		mutex_4.lock();
 		vector<vector<AGPacket>> tmp=DB_Buffer;
 		DB_Buffer.clear();
 		mutex_4.unlock();
-		
+		string lastStr="";
 
 		for(int i=0;i<tmp.size();i++){
 			for(int j=0;j<tmp[i].size();j++){
-				cc++;
-				this->database->appendINSERTION(tmp[i].at(j));
-				//this->database->writeDetection(tmp[i].at(j));
+				this->database->appendINSERTION(tmp[i].at(j),&lastStr);
 			}
 		}
 		
