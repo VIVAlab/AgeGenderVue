@@ -103,7 +103,7 @@ vector<FaceContent> FaceTracker::Track(Mat& frame, Mat& greyImage, vector<FaceCo
         //Reverse the detection
         else if (currentState == FALSE_DETECT)
         {
-			id_counter--;
+			//id_counter--;
 			//cout<<("FALSE_DETECT")<<endl;
 			if(trackedFaces.size()>0)
 				trackedFaces.erase(trackedFaces.begin()+i);

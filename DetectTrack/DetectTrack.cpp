@@ -35,7 +35,7 @@ vector<FaceContent> DetectTrack::DetectFaces(Mat frame){
 vector<FaceContent> DetectTrack::Frame_Process(Mat& frame,Mat& grayFrame){    
     vector<FaceContent> rects;
 	vector<FaceContent> facesinf;
-	IplImage greyImage=grayFrame.clone();
+	//IplImage greyImage=grayFrame.clone();
     
     
     rects = DetectFaces(frame);
@@ -54,8 +54,8 @@ vector<FaceContent> DetectTrack::Frame_Process(Mat& frame,Mat& grayFrame){
             rect[1] = rects[i].currentrect.y;
             rect[2] = rects[i].currentrect.x+ rects[i].currentrect.width;
             rect[3] = rects[i].currentrect.y+ rects[i].currentrect.height;
-            
-            faceObj->my_Landmark(&greyImage, &result, rect);
+			
+			faceObj->my_Landmark(&(IplImage)grayFrame, &result, rect);
             
             //Is the face a true detection
             if (result > faceObj->detection_threshold)

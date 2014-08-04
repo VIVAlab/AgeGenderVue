@@ -6,6 +6,8 @@ using namespace std;
 struct AGPacket
 {
 public:
+	AGPacket(void){}
+	~AGPacket(void){}
 	void set(int _faceID, bool _gender, int _ageCatg){
 		this->faceID=_faceID;
 		this->gender=_gender;

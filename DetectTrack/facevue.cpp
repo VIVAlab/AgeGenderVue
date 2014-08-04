@@ -60,7 +60,7 @@ vector<Rect> FaceVue::detect_ALLFacesROI(const IplImage *frame, IplImage* input)
 	}
 
     /// TO DO What is 1.25,2, Size(30,30)
-    detection_Model->detectMultiScale( input, faces, 1.1, 3, 0|CV_HAAR_SCALE_IMAGE, Size(50, 50) );
+    detection_Model->detectMultiScale( input, faces, 1.1, 3, 0|CV_HAAR_SCALE_IMAGE, Size(10, 10) );
 
     target_Face->index = -1;
 
@@ -77,7 +77,7 @@ CvRect FaceVue::detect_FaceROI(const IplImage *frame)
     cvEqualizeHist(input,input);
 
     /// TO DO What is 1.25,2, Size(30,30)
-    detection_Model->detectMultiScale( input, faces, 1.1, 3, 0|CV_HAAR_SCALE_IMAGE, Size(50, 50) );
+    detection_Model->detectMultiScale( input, faces, 1.1, 3, 0|CV_HAAR_SCALE_IMAGE, Size(10, 10) );
 
     double value;
     int maxArea = 0;

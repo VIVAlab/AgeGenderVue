@@ -22,11 +22,13 @@ using namespace std;
 
 class last_result{
 public:
+	last_result(void){}
 	last_result(int id){
 		faceID=id;
 		gender=-1;
 		age=-1;
 	}
+	
 	~last_result(void){}
 	int faceID;
 	int gender;
@@ -36,6 +38,8 @@ public:
 
 class Item{
 public:
+	Item(void){}
+	~Item(void){}
 	vector<FaceContent> rects;
 	Mat frame;
 	int	last_age;
@@ -43,6 +47,8 @@ public:
 };
 class Item_AG{
 public:
+	Item_AG(void){}
+	~Item_AG(void){}
 	vector<AGPacket> rects_inf;
 };
 
@@ -51,7 +57,7 @@ class PacketProcessor
 public:
     PacketProcessor(void);
     ~PacketProcessor(void);
-    
+    bool flag;
 private:
 	clock_t init, final;
     string text_FT,text_FA, text_FS, text_MT, text_MA, text_MS;
@@ -67,7 +73,7 @@ private:
     DetectTrack DT_obj;	
     AGRecognitionCore AG_obj;
     
-    mutex mutex_1, mutex_3, mutex_4;
+    mutex mutex_1, mutex_2, mutex_3, mutex_4;
 	Item* item;
     Item* item2;
 	Item_AG* item_ag;
@@ -78,10 +84,11 @@ private:
 
 public:
 	void Update_facesINframe(vector<FaceContent>& tmp){
+		int indx, id;
+		vector<int> toerase;
+		auto it= last_results.begin();
 		
-		int indx;
-		for (std::map<int, last_result*>::iterator it=last_results.begin(); it!=last_results.end(); ++it)
-		{
+		while(it!= last_results.end()){
 			indx=-1;
 			for(int j=0;j<tmp.size();j++){
 				if(tmp[j].faceID==it->second->faceID){
@@ -91,16 +98,21 @@ public:
 			}
 			if(indx==-1)
 			{
-				std::map<int, last_result*>::iterator toErase = it;
-				++it;
-				last_results.erase(toErase);
+				toerase.push_back(it->first);
+				
 			}
+			it++;
 		}
-        
+
+	for(int i=0;i<toerase.size();i++){
+		delete last_results[toerase[i]];
+		last_results.erase(toerase[i]);
+	}
+
 
 		for(int i=0;i<tmp.size();i++){
 			if(last_results.find(tmp[i].faceID)==last_results.end()){
-				last_result* a=new last_result(tmp[i].faceID);
+				last_result* a= new last_result(tmp[i].faceID);
 				last_results[tmp[i].faceID]=a;
 			}
 		}
@@ -117,6 +129,7 @@ public:
 
     void putItem() {
         
+		cout<<"P1"<<endl;
 		//cap>>frame;
         Mat img;
         if(camera_type == FIREFLY)
@@ -129,29 +142,39 @@ public:
             cvtColor(img, frame, CV_GRAY2RGB);
        else
             frame = img;
-
+	   cout<<"P2"<<endl;
 		flip(frame,frame,1);
 		cvtColor(frame,grayFrame,CV_RGB2GRAY);
-		
-		item->rects=DT_obj.Frame_Process(frame,grayFrame);
 		item->frame=frame.clone();
+		Mat gg=grayFrame.clone();
+		item->rects=DT_obj.Frame_Process(item->frame,gg);
+		if(item->rects.size()==0)
+			goto SHOW;
+		mutex_2.lock();
 		Update_facesINframe(item->rects);
-		
+		mutex_2.unlock();
 		mutex_1.lock();
 		queue_face_AGEGENDER.push(item);
         mutex_1.unlock();
-		
-		showFrame(item->rects);
+		cout<<"P3"<<endl;
+		SHOW: showFrame(item->rects);
+		cout<<"P4"<<endl;
     }
     
 
     void processItem() {
+		cout<<"C1"<<endl;
 		vector<AGPacket> rects_inf;
         item2 = NULL;
-		if (queue_face_AGEGENDER.size()==0) {
+		int size=0;
+		mutex_1.lock();
+		size=queue_face_AGEGENDER.size();
+		mutex_1.unlock();
+		if (size==0) {
 			//mutex_1.unlock(); // If missing -> Candidate for a deadlock!
 			return;
         } else {
+			cout<<"C2"<<endl;
 			mutex_1.lock();
 			if(queue_face_AGEGENDER.size()>STACK_OVERFLOW_SIZE)
 			{
@@ -161,8 +184,7 @@ public:
 			item2 = queue_face_AGEGENDER.front();
 			queue_face_AGEGENDER.pop();
 			mutex_1.unlock();
-
-			//cout<<queue_face_AGEGENDER.size()<<endl;
+			cout<<"C3"<<endl;
 			string currentTime=getCurrentDateTime();
 			rects_inf= AG_obj.Face_Process(item2->frame,item2->rects);
 			for(int i=0;i<rects_inf.size();i++)
@@ -171,12 +193,15 @@ public:
 				mutex_4.lock();
 				DB_Buffer.push_back(rects_inf);
 				mutex_4.unlock();
-		
-			if(rects_inf.size()!=0)
+		cout<<"C4"<<endl;
+			if(rects_inf.size()!=0){
+			mutex_2.lock();
 				Update_facesINframe(rects_inf);
+			mutex_2.unlock();
+			}
 				
 			
-            
+            cout<<"C5"<<endl;
         }
         
     }
@@ -194,7 +219,7 @@ public:
 		vector<vector<AGPacket>> tmp=DB_Buffer;
 		DB_Buffer.clear();
 		mutex_4.unlock();
-		cout<<"hey"<<endl;
+		
 
 		for(int i=0;i<tmp.size();i++){
 			for(int j=0;j<tmp[i].size();j++){
@@ -203,7 +228,7 @@ public:
 				//this->database->writeDetection(tmp[i].at(j));
 			}
 		}
-		cout<<cc<<endl;
+		
 		this->database->writeINdb();
 		
 	
@@ -265,7 +290,8 @@ public:
 			}                
 		}
 		imshow("Window",frame);
-		waitKey(1);
+		if(waitKey(1)=='q')
+			flag=false;
     }
     
 };

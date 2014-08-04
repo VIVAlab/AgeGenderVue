@@ -15,7 +15,8 @@ PacketProcessor::PacketProcessor(void)
 
     firefly_camera = new VideoCaptureFirefly();
     //find and open a firefly camera
-    camera_type = (firefly_camera->open(0) ? FIREFLY : WEBCAM);
+    //camera_type = (firefly_camera->open(0) ? FIREFLY : WEBCAM);
+	camera_type=WEBCAM;
     
     if (camera_type == WEBCAM) // if firefly camera is not available, then
         cap.open(0);           // open the default webcam
@@ -29,7 +30,7 @@ PacketProcessor::PacketProcessor(void)
     //cap.open(0);
 	//cap>>frame;
     Mat img;
-
+	flag=true;
     if(camera_type == FIREFLY)
             firefly_camera->read(img);
     else if(camera_type == WEBCAM)
@@ -50,4 +51,5 @@ PacketProcessor::~PacketProcessor(void)
 {
     if(camera_type == FIREFLY)
        delete firefly_camera;
+	flag=false;
 }

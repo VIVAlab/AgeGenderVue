@@ -12,45 +12,40 @@ public:
 	PersonOnTrack(){
 		//age_front.push_back(1);
 	}
-	PersonOnTrack(int iindex, int iage, int igender)//:age_front(vector<int>(1,0))
+	PersonOnTrack(int iindex, int iage, int igender)//:age_fr(vector<int>()),gender_fr(vector<int>())
 	{
+		age_fr=vector<int>();
+		gender_fr=vector<int>();
+
+		age=new int[3];
+		gender=new int[2];
 
 		for(int i=0;i<3;i++)
 			age[i]=0;
-		cout<<"G1"<<endl;
+
 		age[iage]=1;
 		gender[igender]=1;
 		gender[(1-igender)]=0;
-		cout<<"G2"<<endl;
+
 		index=iindex;
-		cout<<"G3"<<endl;
 		status=true;
-		age_sum=1;
-		gender_sum=1;
-		cout<<"G3.1"<<endl;
-		age_front.clear();
-		gender_front.clear();
-
-		//vector<int> hh ;
-		//hh.push_back(1);
-
-		//cout<<hh.size()<<endl;
-		cout<<age_front.size()<<endl;
-        cout<<iage<<endl;
-		age_front.push_back(iage);
-		cout<<"G3.2"<<endl;
-		//gender_front.push_back(igender);
-		cout<<"G4"<<endl;
-		int a  = 1;
-		cout<<"G5"<<endl;
+	
+		age_fr.push_back(iage+0);
+		gender_fr.push_back(igender+0);
+		
 	}
 	
-	~PersonOnTrack(){}
+	~PersonOnTrack(){
+		if(age)
+			delete[] age;
+		if(gender)
+			delete[] gender;
+	}
 
-	int age[3];
-	int gender[2];
-	vector<int> age_front;
-	vector<int> gender_front;
+	int* age;
+	int* gender;
+	vector<int> age_fr;
+	vector<int> gender_fr;
 	int age_sum;
 	int gender_sum;
 	int index;
@@ -83,22 +78,20 @@ public:
 
 	void updateAgeGender(int _gender, int _age){
 		
-		if(gender_front.size()>=VOTING_CAPACITY){
-			cout<<"size "<<gender_front.size()<<endl;
-			cout<<" addad "<<gender_front[0]<<endl;
-			gender[gender_front[0]]--;
-			gender_front.erase(gender_front.begin());
+		if(gender_fr.size()>=VOTING_CAPACITY){
+			gender[gender_fr[0]]--;
+			gender_fr.erase(gender_fr.begin());
 		}
 
-		if(age_front.size()>=VOTING_CAPACITY){
+		if(age_fr.size()>=VOTING_CAPACITY){
 		
-			age[age_front[0]]--;
-			age_front.erase(age_front.begin());
+			age[age_fr[0]]--;
+			age_fr.erase(age_fr.begin());
 		}
 		age[_age]++;
-		age_front.push_back(_age);
+		age_fr.push_back(_age);
 		gender[_gender]++;
-		gender_front.push_back(_gender);
+		gender_fr.push_back(_gender);
 		age_sum++;
 		gender_sum++;
 	}

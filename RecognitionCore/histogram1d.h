@@ -6,7 +6,6 @@
 #include <opencv2/ml/ml.hpp>
 #include <opencv2/features2d/features2d.hpp>
 #include <opencv2/nonfree/nonfree.hpp>
-#include <dirent.h>
 #include <fstream>
 
 using namespace cv;

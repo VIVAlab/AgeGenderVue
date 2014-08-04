@@ -22,7 +22,7 @@ public:
 	vector<AGPacket> Face_Process(Mat frame, vector<FaceContent> faces);
 	
 private:
-	map<int, PersonOnTrack> inFrameFaces;
+	map<int, PersonOnTrack*> inFrameFaces;
 	LBPHISTOGRAM* Recognizer;
 
 	int GenderPredict(Mat* input);
