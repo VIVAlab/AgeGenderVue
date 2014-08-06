@@ -16,6 +16,7 @@ struct Hist_Points{
     int y;
     int radius;
     int blk_siz;
+    int lbp_sift;
 };
 
 
@@ -87,6 +88,8 @@ public:
 
     int Local_LBPFilter(Mat *input, Mat& dest, bool u2, int N, int R, int X, int Y,int blk_size);
 
+	void Local_SIFTPatchHistogram(Mat *input, Mat& dest, int x,int y, int BLOCK_SIZ);
+
     Mat PatchHistogram(Mat *warp_dst);
 
     Mat rotate(Mat* image_input, int x_1, int y_1, int x_2, int y_2, int length=66 );
@@ -97,7 +100,7 @@ public:
 
     bool Load_Gender_Points(string file_name);
 
-    bool Load_Age_Points(string file_name);
+    bool Load_Age_Points(string file_name,int lbp_sift);
 
 
     Mat AGE_descriptor(Mat *warp_dst);
@@ -109,8 +112,6 @@ private:
     int age_numOPtch;
 
     Mat train_Data;
-    string Train_File;
-    string Train_LbL;
     CvSVM MYSVM;
     CvSVM GENDER_SVM;
     CvSVM AGE_SVM;

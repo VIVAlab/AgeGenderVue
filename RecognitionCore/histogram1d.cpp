@@ -339,7 +339,20 @@ int LBPHISTOGRAM::Local_LBPFilter(Mat *input, Mat& dest, bool u2, int N, int R, 
     return max; //maximum value in the image pixels (for u2, the max value = the value given to all pixels with >2 changes)
 }
 
+void LBPHISTOGRAM::Local_SIFTPatchHistogram(Mat *input, Mat& dest, int x,int y, int BLOCK_SIZ){
+    int w = BLOCK_SIZ;
+    int h = BLOCK_SIZ;
 
+    int BLOCK_NUM=input->rows/BLOCK_SIZ;
+
+    vector<KeyPoint> keyps;
+
+    KeyPoint k(x+(w/2),y+(h/2),BLOCK_SIZ);
+    keyps.push_back(k);
+    SiftDescriptorExtractor descriptorExtractor;
+
+    descriptorExtractor.compute(*input,keyps,dest);
+}
 
 
 /**
@@ -363,11 +376,14 @@ Mat LBPHISTOGRAM::ROItoHistogram(Mat result, bool u2, int max) //bool u2, int N,
 }
 
 LBPHISTOGRAM::LBPHISTOGRAM(){
-    //Train_File="Train.bin";
-    Train_LbL="Train_LbL2.txt";
-
+    
 	Load_Gender_Points("Models\\gender_par.txt");
-    Load_Age_Points("Models\\age_par.txt");
+	Load_Age_Points("Models\\age_par_LBPN.txt",1);
+    Load_Age_Points("Models\\age_par_SIFTN.txt",2);
+    age_numOPtch=147*59+30*128;//120*59;
+	initModule_nonfree();
+	initModule_features2d();
+
 	SVM_LBP_Train();
     is_rotated=false;
     
@@ -444,7 +460,7 @@ Mat LBPHISTOGRAM::GENDER_descriptor(Mat *warp_dst){
     return histograms;
 }
 
-Mat LBPHISTOGRAM::AGE_descriptor(Mat *warp_dst){
+/*Mat LBPHISTOGRAM::AGE_descriptor(Mat *warp_dst){
 
     Mat histograms(Size(age_points.size()*59, 1), DataType<float>::type); //type code 0 = CV_8U (the int code value yielded by calling .type() for the hist returned from ROItoHistogram)
     float *basePtr_histograms = (float*)histograms.data;
@@ -472,7 +488,49 @@ Mat LBPHISTOGRAM::AGE_descriptor(Mat *warp_dst){
         }
     }
     return histograms;
+}*/
+Mat LBPHISTOGRAM::AGE_descriptor(Mat *warp_dst){
+
+    Mat histograms(1,147*59+30*128, DataType<float>::type); //type code 0 = CV_8U (the int code value yielded by calling .type() for the hist returned from ROItoHistogram)
+    float *basePtr_histograms = (float*)histograms.data;
+    int histInd = 0;
+    Mat hist2;
+    int max;
+    Mat temp=warp_dst->clone();
+	int counter_1=0,counter_2=0;
+    for(int i=0;i<age_points.size();i++){
+        Mat ROI,ROI2;
+        int BLOCK_NUM=warp_dst->rows/age_points[i].blk_siz;
+        int offset=0;//floor((warp_dst->rows-BLOCK_NUM*age_points[i].blk_siz)/2);
+		
+        if(age_points[i].lbp_sift==1){
+            max = Local_LBPFilter(warp_dst,ROI, 1, 8, age_points[i].radius,age_points[i].x+offset,age_points[i].y+offset,age_points[i].blk_siz); //
+            ROI.convertTo(ROI,CV_8UC1);
+			if(!ROI.empty())
+				counter_1++;
+            Mat hist = ROItoHistogram(ROI, 0, max);
+
+            cv::transpose(hist,hist);
+
+            hist.convertTo(hist2, DataType<float>::type);
+        }else{
+            Local_SIFTPatchHistogram(&temp,ROI2,age_points[i].x+offset,age_points[i].y+offset,age_points[i].blk_siz); //
+			if(!ROI2.empty())
+				counter_2++;
+            ROI2.convertTo(hist2, DataType<float>::type);
+            sqrt(hist2,hist2);
+        }
+
+        float *basePtr_hist2 = (float*)hist2.data;
+        for(int d = 0; d < hist2.cols && histInd < histograms.cols; d++)//each histogram bin
+        {
+            *(basePtr_histograms + histInd) = *(basePtr_hist2 + d);
+            histInd++;
+        }
+    }
+    return histograms;
 }
+
 
 
 Mat LBPHISTOGRAM::rotate(Mat *image_input, int x_1, int y_1, int x_2, int y_2, int length )
@@ -526,7 +584,7 @@ void LBPHISTOGRAM::norm_1(Mat input, Mat &output){
 void LBPHISTOGRAM::SVM_LBP_Train(){
 
     GENDER_SVM.load("Models//gender_svm.bin");
-    AGE_SVM.load("Models//age_svm.bin");
+    AGE_SVM.load("Models//age_svm_sift.bin");
 }
 
 int LBPHISTOGRAM::SVM_Predictor(Mat *test_image){
@@ -565,22 +623,16 @@ int LBPHISTOGRAM::gender_predictor(Mat *test_image){
 }
 int LBPHISTOGRAM::age_predictor(Mat *test_image){
 
-    Point2i val;
-    val.x=0;
-    val.y=0;
-    Mat testMat_=AGE_descriptor(test_image);
+    Mat testMat=AGE_descriptor(test_image);
 
-    Mat testMat=Mat::zeros(1,age_numOPtch,DataType<float>::type);
-    float* Ptr_testMat=(float*)testMat.data;
-    float* Ptr_testMat_=(float*)testMat_.data;
-    for(int j=0;j<age_numOPtch;j++){
-        *(Ptr_testMat+j)=sqrt(*(Ptr_testMat_+j));
-    }
+    sqrt(testMat,testMat);
+    
     float response=AGE_SVM.predict(testMat);
+	cout<<response<<endl;
     int response_i=-1;
-    if(response<1.5)
+    if(response<=0.5)
         response_i=0;
-    else if(response<2.5)
+    else if(response<=1.5)
         response_i=1;
     else
         response_i=2;
@@ -624,7 +676,7 @@ bool LBPHISTOGRAM::Load_Gender_Points(string file_name){
 }
 
 
-bool LBPHISTOGRAM::Load_Age_Points(string file_name){
+bool LBPHISTOGRAM::Load_Age_Points(string file_name,int lbp_sift){
     ifstream input;
     input.open(file_name.c_str());
     if(!input.is_open())
@@ -637,24 +689,30 @@ bool LBPHISTOGRAM::Load_Age_Points(string file_name){
         int counter=0;
         int ti,tj,tk;
         string str;
+
         while (getline( input, str))
         {
-            if(counter>=2000)
-                break;
+
             Hist_Points a;
+            a.lbp_sift=lbp_sift;
             ti=str.find_first_of(",");
             tj=str.find_first_of(":");
             tk=str.find_first_of(";");
+            if(lbp_sift!=1)
+                tj=tk;
+
             a.y=atoi(str.substr(0,ti).c_str());
             a.x=atoi(str.substr(ti+1,tj-ti-1).c_str());
-            a.radius=atoi(str.substr(tj+1,tk-ti-1).c_str());
+            if(lbp_sift==1)
+                a.radius=atoi(str.substr(tj+1,tk-ti-1).c_str());
             a.blk_siz=atoi(str.substr(tk+1,str.length()-tk-1).c_str());
             age_points.push_back(a);
             counter++;
         }
+
         input.close();
     }
-    age_numOPtch=age_points.size()*59;
     return true;
 
 }
+
