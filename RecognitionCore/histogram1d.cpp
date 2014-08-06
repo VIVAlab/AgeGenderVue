@@ -386,8 +386,6 @@ LBPHISTOGRAM::LBPHISTOGRAM(){
 
 	SVM_LBP_Train();
     is_rotated=false;
-    
-
 
 }
 
@@ -584,7 +582,7 @@ void LBPHISTOGRAM::norm_1(Mat input, Mat &output){
 void LBPHISTOGRAM::SVM_LBP_Train(){
 
     GENDER_SVM.load("Models//gender_svm.bin");
-    AGE_SVM.load("Models//age_svm_sift.bin");
+    AGE_SVM.load("Models//age_svm_sift_v2.bin");
 }
 
 int LBPHISTOGRAM::SVM_Predictor(Mat *test_image){
@@ -615,12 +613,13 @@ int LBPHISTOGRAM::gender_predictor(Mat *test_image){
         *(Ptr_testMat+j)=sqrt(*(Ptr_testMat_+j));
     }
     float response=GENDER_SVM.predict(testMat);
-    if(response>0)
+    if(response>0.5)
         val=1;
     else
         val=0;
     return val;
 }
+
 int LBPHISTOGRAM::age_predictor(Mat *test_image){
 
     Mat testMat=AGE_descriptor(test_image);

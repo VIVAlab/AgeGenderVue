@@ -264,21 +264,21 @@ public:
                     
                     if (size < 0.5)     size = 0.5;
 					
-					if(_gender){
-						if (_age < .5)
-							currentGenderAge=text_MT;
+					if(_gender>0.5){
+						if (_age < 0.5)
+							currentGenderAge=text_MT+"";
 						else if (_age < 1.5)
-							currentGenderAge=text_MA;
+							currentGenderAge=text_MA+"";
 						else if (_age > 1.5)
-							currentGenderAge=text_MS;	
+							currentGenderAge=text_MS+"";	
 					}
                     else{
-						if (_age < .5)
-							currentGenderAge=text_FT;
+						if (_age < 0.5)
+							currentGenderAge=text_FT+"";
 						else if (_age < 1.5)
-							currentGenderAge=text_FA;
+							currentGenderAge=text_FA+"";
 						else if (_age > 1.5)
-							currentGenderAge=text_FS;
+							currentGenderAge=text_FS+"";
 					}
                     
                     putBoldedText(frame, currentGenderAge.c_str(), p11, size);
