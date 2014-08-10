@@ -10,4 +10,9 @@ Makefile.Debug
 Makefile.Release
 object_script.GenderRecognition.Debug
 object_script.GenderRecognition.Release
-results.db
+AgeGender.sdf
+AgeGender.sln
+AgeGender.v11.suo
+AgeGender.vcxproj
+debugPropertySheet.props
+releasePropertySheet.props
