@@ -1,7 +1,13 @@
 Database
-debug
 Models
-release
+Release
+Debug
+AgeGender.opensdf
+AgeGender.sdf
+AgeGender.suo
+AgeGender.v11.suo
+releasePropertySheet.props
+debugPropertySheet.props
 GenderRecognition.pro
 GenderRecognition.pro.autosave
 GenderRecognition.pro.user
@@ -10,4 +16,3 @@ Makefile.Debug
 Makefile.Release
 object_script.GenderRecognition.Debug
 object_script.GenderRecognition.Release
-results.db
