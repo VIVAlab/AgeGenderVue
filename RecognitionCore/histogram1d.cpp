@@ -378,8 +378,10 @@ Mat LBPHISTOGRAM::ROItoHistogram(Mat result, bool u2, int max) //bool u2, int N,
 LBPHISTOGRAM::LBPHISTOGRAM(){
     
 	Load_Gender_Points("Models\\gender_par.txt");
-	Load_Age_Points("Models\\age_par_LBPN.txt",1);
-    Load_Age_Points("Models\\age_par_SIFTN.txt",2);
+	//was Load_Age_Points("Models\\age_par_LBPN.txt",1);  //MISSING FILE
+    Load_Age_Points("Models\\age_par.txt",1);
+    //was Load_Age_Points("Models\\age_par_SIFTN.txt",2); //MISSING FILE
+    Load_Age_Points("Models\\age_par.txt",2);
     age_numOPtch=147*59+30*128;//120*59;
 	initModule_nonfree();
 	initModule_features2d();

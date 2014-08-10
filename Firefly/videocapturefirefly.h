@@ -2,12 +2,12 @@
 #define VIDEOCAPTUREFIREFLY_H
 
 #include <iostream>
-//#include "FlyCapture2.h"
+#include "FlyCapture2.h"
 #include "opencv2/core/core.hpp"
 #include "opencv/cv.h"
 
 using namespace std;
-//using namespace FlyCapture2;
+using namespace FlyCapture2;
 using namespace cv;
 
 enum CameraType {FIREFLY, WEBCAM, OTHER};
@@ -36,12 +36,12 @@ class VideoCaptureFirefly
 {
 
 private:
-	//Error error;
-	//BusManager busMgr;
+	Error error;
+	BusManager busMgr;
 	unsigned int numCameras;
-	//PGRGuid guid;
-	//Camera cam;
-	//Image rawImage;
+	PGRGuid guid;
+	Camera cam;
+	Image rawImage;
 	bool camera_initialized;
 
 public:
@@ -52,7 +52,6 @@ public:
         ~VideoCaptureFirefly()
         {
             // Stop capturing images
-            /*
 			error = cam.StopCapture();
 
             if (error != PGRERROR_OK)
@@ -68,14 +67,11 @@ public:
                error.PrintErrorTrace();
                return;
             }
-			*/
-
         }
 
         bool open(int camera_number)
         {
             //camera_initialized = false;
-            /*
 			error = busMgr.GetNumOfCameras(&numCameras);
             if (error != PGRERROR_OK)
             {
@@ -106,7 +102,7 @@ public:
                 return false;
             }
 
-                // Start capturing images
+            // Start capturing images
             error = cam.StartCapture();
             if (error != PGRERROR_OK)
             {
@@ -114,12 +110,10 @@ public:
                 return false;
             }
             camera_initialized = true;
-			*/
             return camera_initialized;
         }
 
         
-
         bool is_firefly_camera_present()
         {
             return camera_initialized;
@@ -128,7 +122,6 @@ public:
         int read(Mat & frame)
         {
             // Retrieve an image
-			/*
 			error = cam.RetrieveBuffer( &rawImage );
             if (error != PGRERROR_OK)
             {
@@ -136,9 +129,8 @@ public:
                 return -1;
             }
 
-	    // create a opencv image
-	    frame =  Mat( rawImage.GetRows(), rawImage.GetCols(), CV_8UC1, rawImage.GetData());
-		*/
+	       // create a opencv image
+	      frame =  Mat( rawImage.GetRows(), rawImage.GetCols(), CV_8UC1, rawImage.GetData());
 	    return 0;
 	}
 };
