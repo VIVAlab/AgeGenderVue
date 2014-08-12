@@ -1,5 +1,4 @@
 #include "PacketProcessor.h"
-#include "persistence\dbinterface.h"
 #include "persistence\sqlitedb.h"
 
 PacketProcessor::PacketProcessor(void)
@@ -43,7 +42,8 @@ PacketProcessor::PacketProcessor(void)
         frame = img;
  
     init_time=true;
-	database = new SqliteDB("Database//results.db");
+	string t=getCurrentDateTime();
+	database = new SqliteDB(t);
 }
 
 

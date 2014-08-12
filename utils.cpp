@@ -7,9 +7,11 @@ std::string getCurrentDateTime() {
     struct tm  tstruct;
     char       buf[80];
 	tstruct = *localtime(&now);
+	int time_id=(tstruct.tm_hour*360+tstruct.tm_min*6)+tstruct.tm_sec/10;
     // Visit http://en.cppreference.com/w/cpp/chrono/c/strftime
     // for more information about date/time format
-    strftime(buf, sizeof(buf), "%Y-%m-%d.%X", &tstruct);
+	sprintf(buf,"%04d-%02d-%02d-%d",tstruct.tm_year+1900, tstruct.tm_mon+1, tstruct.tm_mday+1, time_id);
+	
 
     return buf;
 }

@@ -79,7 +79,7 @@ private:
 	Item_AG* item_ag;
 	Item_AG* item_ag2;
 	bool init_time;
-	vector<vector<AGPacket>> DB_Buffer;
+	map<int, int> DBB;
 	map<int, last_result*> last_results;	
 
 public:
@@ -161,6 +161,12 @@ public:
     }
     
 
+	void DB_Buffer_Pushback(vector<AGPacket> rects){
+		for(int i=0;i<rects.size();i++){
+			DBB[rects[i].faceID]=(rects[i].gender+1)*10+rects[i].ageCatg;
+		}
+	}
+
     void processItem() {
 		
 		vector<AGPacket> rects_inf;
@@ -190,7 +196,7 @@ public:
 				rects_inf[i].currentTime=currentTime;
 
 				mutex_4.lock();
-				DB_Buffer.push_back(rects_inf);
+				DB_Buffer_Pushback(rects_inf);
 				mutex_4.unlock();
 		
 			if(rects_inf.size()!=0){
@@ -211,20 +217,39 @@ public:
         return -1;
     }
     
-	void Write_DB(){
+	void Write_DB(string _time){
 		mutex_4.lock();
-		vector<vector<AGPacket>> tmp=DB_Buffer;
-		DB_Buffer.clear();
+		map<int,int> tmp2=DBB;
+		DBB.clear();
 		mutex_4.unlock();
-		string lastStr="";
-
-		for(int i=0;i<tmp.size();i++){
-			for(int j=0;j<tmp[i].size();j++){
-				this->database->appendINSERTION(tmp[i].at(j),&lastStr);
-			}
-		}
 		
-		this->database->writeINdb();
+		int ft=0,mt=0,fa=0,ma=0,fs=0,ms=0;
+
+		for (std::map<int,int>::iterator it=tmp2.begin(); it!=tmp2.end(); ++it)
+			switch (it->second)
+		{
+			case 10:
+				ft++;
+				break;
+			case 11:
+				fa++;
+				break;
+			case 12:
+				fs++;
+				break;
+			case 20:
+				mt++;
+				break;
+			case 21:
+				ma++;
+				break;
+			case 22:
+				ms++;
+			default:
+				break;
+		}
+
+		this->database->writeINdb(_time,ft,fa,fs,mt,ma,ms);
 		
 	
 	}
@@ -233,7 +258,8 @@ public:
 		(init_time==true) && (init=clock()) &&  ( init_time=false);
 		
 		if(abs(clock()-init-10000)<100){
-			Write_DB();
+			string curr=getCurrentDateTime();
+			Write_DB(curr);
 			init=clock();
 		}
 	}
